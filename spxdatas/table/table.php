@@ -1,5 +1,5 @@
 
-<table name="product" maxparam="4" groupe="mcatalogue" order="true"  >
+<table name="mcatalogue_product" maxparam="4" groupe="mcatalogue" order="true"  >
 	<description><![CDATA[<p>Your content catalog</p>]]></description>
 	<column>
 		<parameter name="title" type="cdata" option="textinput/30/40" ></parameter>
@@ -19,7 +19,7 @@
 	</actions>		
 </table>
 
-<table name="category" maxparam="3" groupe="mcatalogue" >
+<table name="mcatalogue_category" maxparam="3" groupe="mcatalogue" >
 	<description><![CDATA[<p>Your content catalog</p>]]></description>
 	<column>
 		<parameter name="title" type="cdata" option="textinput/30/40" ></parameter>
@@ -29,9 +29,10 @@
 	</column>
 </table>
 
-<table name="configuration" maxparam="3" maxrecord="1" groupe="mcatalogue" >
+<table name="mcatalogue_configuration" maxparam="3" maxrecord="1" groupe="mcatalogue" >
 	<description><![CDATA[]]></description>
 	<column>
-		<parameter name="currency" type="cdata" option="textinput/5/5" ></parameter>		
+		<parameter name="currency" type="cdata" option="textinput/5/5" ></parameter>
+		<parameter name="itemsByPage" type="cdata" option="textinput/5/5" ></parameter>			
 	</column>
 </table>

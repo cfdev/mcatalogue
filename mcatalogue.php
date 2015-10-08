@@ -4,10 +4,10 @@
  *
  * @package cfdev
  * @version	
- * @date	01/10/2015
- * @author	cfdev
+ * @date	08/10/2015
+ * @author	Cyril Frausti
+ * @url		http://cfdev.fr
  **/
-
 
 class mcatalogue extends plxPlugin {	
 	private $template = "static.php"; # template utilisé pour la page statique
@@ -29,8 +29,7 @@ class mcatalogue extends plxPlugin {
 		# Hooks
 		$this->addHook('plxShowConstruct', 'plxShowConstruct'); // Obligatoire
 		$this->addHook('plxMotorPreChauffageBegin', 'plxMotorPreChauffageBegin');
-        $this->addHook('mcatalogueShow', 'mcatalogueShow');		
-		
+        $this->addHook('mcatalogueShow', 'mcatalogueShow');	
 	}	
 	/**
 	 * Méthode qui initialise les variables
@@ -40,7 +39,7 @@ class mcatalogue extends plxPlugin {
 	public function initconfiguration() {
 		# VARIOUS PARAMS
 		$this->setParam('spxdatas_widget', '1', 'string');
-		$this->setParam('spxshortcodes_shortcode', '1', 'string');
+		$this->setParam('spxshortcodes_shortcode', '1', 'string');	//Shortcode	
 	}
 
 	 /**
@@ -121,29 +120,56 @@ class mcatalogue extends plxPlugin {
 	 * @return	stdio
 	 * @author	cfdev
 	 **/
-    public function mcatalogueShow($cat) {
+    public function mcatalogueShow($atts) {
 		global $plxShow;
 		$plxMotor = plxMotor::getInstance();
 		$imagePath = isset($plxMotor->aConf['medias']) ? plxUtils::getRacine().$plxMotor->aConf['medias'] : plxUtils::getRacine().$plxMotor->aConf['images'];
 
+		#Check var entree
+		$cat = $atts["cat"];
+		$page = $atts["page"];
+		$order = $atts["order"];
+		
+		if( !isset($page) || $page<1 ){
+			$page = 1;
+		}
+		
 		# Parcour le tableau config
 		$c = array();
-		$c["table"] = "configuration";
+		$c["table"] = "mcatalogue_configuration";
 		$c["out"] = "array_asso";
 		$tmp = $plxMotor->plxPlugins->aPlugins["spxdatas"];
 		$config = $tmp->getData($c);
 		foreach($config as $val) {			
 			$currency = $val["currency"];
+			$itemsByPage = $val["itemsByPage"];
 		}
 		
 		# Affiche la liste des produits
 		$o= array();
-		$o["table"]="product";
-		$o["filter"]="actif=1 and category=".$cat;
-		$o["out"]="html";
-		$o["format"]='<li class="col sml-6 med-3"><a href="'.$this->url.'/#url" title="#title"><img src="'.$imagePath.'#image" alt="#title"/>#title</a><p>#short_description</p><p>#price'.$currency.'</p></li>';
-
-		echo ("<ul class=\"grid\">".$plxShow->callHook('spxdatas::getData',$o)."</ul>");		
+		$o["table"]		= "mcatalogue_product";
+		$o["filter"]	= "actif=1 and category=".$cat;
+		$o["order"]		= $order;
+		$o["limit"]		= $itemsByPage * $page;
+		$o["offset"]	= $itemsByPage * ($page-1);
+		$o["out"]		= "html";
+		$o["format"]	= '<li class="col sml-6 med-3"><a href="'.$this->url.'/#url" title="#title"><img src="'.$imagePath.'#image" alt="#title"/>#title</a><p>#short_description</p><p>#price'.$currency.'</p></li>';
+			
+		# Affichage
+		echo ("<ul class=\"grid\">".$plxShow->callHook('spxdatas::getData',$o)."</ul>");
+	
+		# Ajoute la pagination si nécessaire
+		$count = array();
+		$count["table"] = "mcatalogue_product";
+		$count["out"] = "array_asso";
+		$tmp = $plxMotor->plxPlugins->aPlugins["spxdatas"];
+		$tabCount = $tmp->getData($count);	
+		if(count($tabCount) > $itemsByPage) {
+			echo '<br/>PAGE:'.$page;
+			echo '<br/>ItemsBy page:'.$itemsByPage;
+			echo '<br/>Offset:'.($itemsByPage * ($page-1));
+			echo ' -> PAGINATION OUI';
+		}		
 	}
 	
 	
@@ -168,7 +194,7 @@ class mcatalogue extends plxPlugin {
 		
 		# Parcour le tableau data
 		$o = array();
-		$o["table"] = "product";
+		$o["table"] = "mcatalogue_product";
 		$o["out"] = "array_asso";
 		$tmp = $plxMotor->plxPlugins->aPlugins["spxdatas"];
 		$products = $tmp->getData($o);	
@@ -204,7 +230,7 @@ class mcatalogue extends plxPlugin {
 		
 		# Parcour le tableau data
 		$o = array();
-		$o["table"] = "product";
+		$o["table"] = "mcatalogue_product";
 		$o["out"] = "array_asso";
 		$tmp = $plxMotor->plxPlugins->aPlugins["spxdatas"];
 		$products = $tmp->getData($o);	

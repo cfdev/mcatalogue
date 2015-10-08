@@ -165,7 +165,7 @@ class mcatalogue extends plxPlugin {
 		$tmp = $plxMotor->plxPlugins->aPlugins["spxdatas"];
 		$tabCount = $tmp->getData($count);	
 		if(count($tabCount) > $itemsByPage) {
-			echo '<br/>PAGE:'.$page;
+			echo '<br/>PAGE:'.$page.' / '.ceil( count($tabCount)/$itemsByPage );
 			echo '<br/>ItemsBy page:'.$itemsByPage;
 			echo '<br/>Offset:'.($itemsByPage * ($page-1));
 			echo ' -> PAGINATION OUI';

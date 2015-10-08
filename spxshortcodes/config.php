@@ -12,12 +12,12 @@
 function mcatalogue_func( $atts, $content = null ) {
 
 	global $plxShow;
-	
+
 	extract( shortcode_atts( array(
-      'cat' => 'cat',
-	  
-      ), $atts ) );
-	  
+		'cat' => 'cat',
+		'order' => 'order',	
+	), $atts ) );
+
 
 	return $plxShow->callHook('mcatalogueShow',$cat);
 }

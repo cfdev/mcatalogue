@@ -12,7 +12,8 @@
 class mcatalogue extends plxPlugin {	
 	private $template = "static.php"; # template utilisé pour la page statique
 	public $url = "mcatalogue"; # motif dans l'url permettant d'accéder à la page statique
-	
+	public $mnuName = "Catalogue"; # titre du menu dans la liste des pages statiques
+
 	/**
 	 * Constructeur de la classe
 	 *
@@ -42,6 +43,13 @@ class mcatalogue extends plxPlugin {
 		# VARIOUS PARAMS
 		$this->setParam('spxdatas_widget', '1', 'string');
 		$this->setParam('spxshortcodes_shortcode', '1', 'string');	//Shortcode	
+		# limite l'accès à l'écran d'administration du plugin
+		$this->setConfigProfil(PROFIL_ADMIN);
+		# get config
+		if (plxUtils::strCheck($this->getParam('mnuName'))=="") $this->setParam('mnuName','Catalogue','string');
+		if (plxUtils::strCheck($this->getParam('template'))=="") $this->setParam('template','static.php','string');
+		$this->mnuName = $this->getParam('mnuName');
+		$this->template = $this->getParam('template');
 	}
 
 	 /**
@@ -56,7 +64,7 @@ class mcatalogue extends plxPlugin {
 			if($this->plxMotor->mode=="'.$this->url.'") {;
 				$array = array();
 				$array[$this->plxMotor->cible] = array(
-					"name"		=> "'.$this->name.'",
+					"name"		=> "'.$this->mnuName.'",
 					"menu"		=> "",
 					"url"		=> "'.$this->url.'",
 					"readable"	=> 1,
@@ -101,12 +109,19 @@ class mcatalogue extends plxPlugin {
      * @author    cfdev
      **/
     public function plxShowPageTitle() {
-
-        if (isset($product["title"])){
-			$this->plxMotor->aConf["title"] = $product["title"];
+		# Récupération d'une instance de plxMotor
+		$plxMotor = plxMotor::getInstance();
+		# Récupération des infos dans l'urls
+		$get = plxUtils::getGets();
+		if($get) {
+			$arrayUrl = explode("/",$get);
+			$getUrl = $arrayUrl[1];
+		}
+		
+        if (isset($getUrl)){
             echo '<?php
                 if($this->plxMotor->mode == '.$this->url.') {
-                    echo plxUtils::strCheck($this->plxMotor->aConf["title"]." - '.$product["title"].'");
+                    echo plxUtils::strCheck($this->plxMotor->aConf["title"]." - '.substr($getUrl, strrpos($getUrl, '/')).'");
                     return true;
                 }
             ?>';
@@ -120,19 +135,14 @@ class mcatalogue extends plxPlugin {
      * @author    cfdev
      **/
     public function SitemapStatics() {
-        if (isset($this->aProds) && is_array($this->aProds)) {
-            foreach($this->aProds as $key => $value) {             
-                    echo '<?php
-                    echo "\n";
-                    echo "\t<url>\n";
-                    echo "\t\t<loc>".$plxMotor->urlRewrite("?product'.$key.'/'.$value['url'].'")."</loc>\n";
-                    echo "\t\t<lastmod>'.date('Y-m-d').'</lastmod>\n";
-                    echo "\t\t<changefreq>daily</changefreq>\n";
-                    echo "\t\t<priority>0.8</priority>\n";
-                    echo "\t</url>\n";
-                    ?>';               
-            }
-        }
+		echo '<?php
+		echo "\n";
+		echo "\t<url>\n";
+		echo "\t\t<loc>".$plxMotor->urlRewrite("?'.$this->url.'")."</loc>\n";
+		echo "\t\t<changefreq>monthly</changefreq>\n";
+		echo "\t\t<priority>0.8</priority>\n";
+		echo "\t</url>\n";
+		?>';
     }
 	
 	/**

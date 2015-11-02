@@ -3,20 +3,20 @@
  * Plugin mcatalogue
  *
  * @package cfdev
- * @version	
- * @date	08/10/2015
+ * @version	2.0
+ * @date	15/10/2015
  * @author	Cyril Frausti
  * @url		http://cfdev.fr
  **/
 
 class mcatalogue extends plxPlugin {	
-	private $template = "static.php"; # template utilisé pour la page statique
-	public $url = "mcatalogue"; # motif dans l'url permettant d'accéder à la page statique
+	private $template = "static.php"; # template utilisÃ© pour la page statique
+	public $url = "mcatalogue"; # motif dans l'url permettant d'accÃ©der Ã  la page statique
 	
 	/**
 	 * Constructeur de la classe
 	 *
-	 * @param	default_lang	langue par défaut
+	 * @param	default_lang	langue par dÃ©faut
 	 * @return	stdio
 	 * @author	CFDEV
 	 **/
@@ -29,10 +29,12 @@ class mcatalogue extends plxPlugin {
 		# Hooks
 		$this->addHook('plxShowConstruct', 'plxShowConstruct'); // Obligatoire
 		$this->addHook('plxMotorPreChauffageBegin', 'plxMotorPreChauffageBegin');
+		$this->addHook('plxShowPageTitle', 'plxShowPageTitle');
+		$this->addHook('SitemapStatics', 'SitemapStatics');
         $this->addHook('mcatalogueShow', 'mcatalogueShow');	
 	}	
 	/**
-	 * Méthode qui initialise les variables
+	 * MÃ©thode qui initialise les variables
 	 *
 	 * @author	JE-EVRARD
 	 **/
@@ -43,10 +45,10 @@ class mcatalogue extends plxPlugin {
 	}
 
 	 /**
-     * Méthode 
+     * MÃ©thode 
      *
      * @return    null
-     * @author    Stéphane F
+     * @author    StÃ©phane F
      **/
 	public function plxShowConstruct() {
 		# infos sur la page statique
@@ -68,12 +70,12 @@ class mcatalogue extends plxPlugin {
 	}
 	
     /**
-     * Méthode qui effectue une analyse de la situation et détermine
-     * le mode à appliquer. Cette méthode alimente ensuite les variables
-     * de classe adéquates
+     * MÃ©thode qui effectue une analyse de la situation et dÃ©termine
+     * le mode Ã  appliquer. Cette mÃ©thode alimente ensuite les variables
+     * de classe adÃ©quates
      *
      * @return    null
-     * @author    Stéphane F
+     * @author    StÃ©phane F
      **/
 	public function plxMotorPreChauffageBegin($template="static.php") {
 		
@@ -91,9 +93,50 @@ class mcatalogue extends plxPlugin {
 		echo "<?php ".$string." ?>";
 	
 	}
+
+    /**
+     * MÃ©thode qui renseigne le titre de la page dans la balise html <title>
+     *
+     * @return    stdio
+     * @author    cfdev
+     **/
+    public function plxShowPageTitle() {
+
+        if (isset($product["title"])){
+			$this->plxMotor->aConf["title"] = $product["title"];
+            echo '<?php
+                if($this->plxMotor->mode == '.$this->url.') {
+                    echo plxUtils::strCheck($this->plxMotor->aConf["title"]." - '.$product["title"].'");
+                    return true;
+                }
+            ?>';
+        }
+    }
+
+    /**
+     * MÃ©thode qui rÃ©fÃ©rence les produits dans le sitemap
+     *
+     * @return    stdio
+     * @author    cfdev
+     **/
+    public function SitemapStatics() {
+        if (isset($this->aProds) && is_array($this->aProds)) {
+            foreach($this->aProds as $key => $value) {             
+                    echo '<?php
+                    echo "\n";
+                    echo "\t<url>\n";
+                    echo "\t\t<loc>".$plxMotor->urlRewrite("?product'.$key.'/'.$value['url'].'")."</loc>\n";
+                    echo "\t\t<lastmod>'.date('Y-m-d').'</lastmod>\n";
+                    echo "\t\t<changefreq>daily</changefreq>\n";
+                    echo "\t\t<priority>0.8</priority>\n";
+                    echo "\t</url>\n";
+                    ?>';               
+            }
+        }
+    }
 	
 	/**
-	 * Méthode a l'activation du plugin
+	 * MÃ©thode a l'activation du plugin
 	 *
 	 * @author	JE-EVRARD
 	 **/
@@ -104,7 +147,7 @@ class mcatalogue extends plxPlugin {
 	# getloc call by spxdatas
 	public function get_loc($mylang) {
 		
-		$filename = PLX_PLUGINS.$this->spxname.'/spxdatas/table/table_loc/'.$mylang.'/admin.php';
+		$filename = PLX_PLUGINS.'mcatalogue/spxdatas/table/table_loc/'.$mylang.'/admin.php';
 		$LANG = array();
 		//echo ("mylang = ".is_file($filename));
 		if(is_file($filename)) {
@@ -114,9 +157,9 @@ class mcatalogue extends plxPlugin {
 	}
 
 	/**
-	 * Méthode qui affiche les produits en fonction de la categorie
+	 * MÃ©thode qui affiche les produits en fonction de la categorie
 	 *
-	 * @param	numéro de la catégorie à afficher
+	 * @param	array (cat, page, order)
 	 * @return	stdio
 	 * @author	cfdev
 	 **/
@@ -144,6 +187,8 @@ class mcatalogue extends plxPlugin {
 			$currency = $val["currency"];
 			$itemsByPage = $val["itemsByPage"];
 		}
+		# URL
+		$url = $plxMotor->urlRewrite('index.php?'.$this->url);
 		
 		# Affiche la liste des produits
 		$o= array();
@@ -153,12 +198,12 @@ class mcatalogue extends plxPlugin {
 		$o["limit"]		= $itemsByPage * $page;
 		$o["offset"]	= $itemsByPage * ($page-1);
 		$o["out"]		= "html";
-		$o["format"]	= '<li class="col sml-6 med-3"><a href="'.$this->url.'/#url" title="#title"><img src="'.$imagePath.'#image" alt="#title"/>#title</a><p>#short_description</p><p>#price'.$currency.'</p></li>';
-			
+		$o["format"]	= '<div class="mcatalogue col sml-6 med-3 col-xs-6 col-md-3"> <div class="product"> <a href="'.$url.'/#url" title="#title"><img src="'.$imagePath.'#image" alt="#title"/>#title</a><p class="short_description">#short_description</p><p><span class="productBackPrice"><span class="productPrice">#price<sup>'.$currency.'</sup></span></span></p></div></div>';
+
 		# Affichage
-		echo ("<ul class=\"grid\">".$plxShow->callHook('spxdatas::getData',$o)."</ul>");
+		echo ("<div class=\"grid row\">".$plxShow->callHook('spxdatas::getData',$o)."</div>");
 	
-		# Ajoute la pagination si nécessaire
+		# DEBUG: Ajoute la pagination si nÃ©cessaire
 		$count = array();
 		$count["table"] = "mcatalogue_product";
 		$count["out"] = "array_asso";
@@ -174,15 +219,36 @@ class mcatalogue extends plxPlugin {
 	
 	
 
+		/**
+	 * MÃ©thode qui retourne la configuration de mcatalogue
+	 *
+	 * @author	cfdev
+	*/
+	public function mcatalogueConfig() {
+		# RÃ©cupÃ©ration d'une instance de plxMotor
+		$plxMotor = plxMotor::getInstance();
+		
+		# Parcour le tableau data
+		$o = array();
+		$o["table"] = "mcatalogue_configuration";
+		$o["out"] = "array_asso";
+		$tmp = $plxMotor->plxPlugins->aPlugins["spxdatas"];
+		$config = $tmp->getData($o);
+		foreach($config as $val) {			
+		}	
+		#Return
+		return $val;
+	}
+	
 	/**
-	 * Méthode qui retourn le contenu du produit
+	 * MÃ©thode qui retourn le contenu du produit
 	 *
 	 * @author	cfdev
 	*/
 	public function productContent() {
-		# Récupération d'une instance de plxMotor
+		# RÃ©cupÃ©ration d'une instance de plxMotor
 		$plxMotor = plxMotor::getInstance();
-		# Récupération des infos dans l'urls
+		# RÃ©cupÃ©ration des infos dans l'urls
 		$get = plxUtils::getGets();
 		if($get) {
 			$arrayUrl = explode("/",$get);
@@ -210,15 +276,57 @@ class mcatalogue extends plxPlugin {
 	}
 
 	/**
-	 * Méthode qui affiche l'image du produit
+	 * MÃ©thode qui affiche l'image du produit
 	 * 
 	 * @param class additionnelle pour l'image
 	 * @author	cfdev
 	*/
 	public function productShowImage($class) {
-		# récupération d'une instance de plxMotor
+		# rÃ©cupÃ©ration d'une instance de plxMotor
 		$plxMotor = plxMotor::getInstance();
-		# Récupération des infos dans l'urls
+		# RÃ©cupÃ©ration des infos dans l'urls
+		$get = plxUtils::getGets();
+		if($get) {
+			$arrayUrl = explode("/",$get);
+			$getUrl = $arrayUrl[1];
+		}
+		else{
+			$getUrl = "mcatalogue::productShowImage : Error getUrl";
+		}
+		
+		# Parcour le tableau data
+		$o = array();
+		$o["table"] = "mcatalogue_product";
+		$o["out"] = "array_asso";
+		$tmp = $plxMotor->plxPlugins->aPlugins["spxdatas"];
+		$products = $tmp->getData($o);	
+
+		foreach($products as $product) {	
+			if($getUrl == $product["url"]) {
+				$image = $product["image"];
+			}
+		}
+		#RÃ©cupÃ©ration du chemin image
+		$imagePath = isset($plxMotor->aConf['medias']) ? plxUtils::getRacine().$plxMotor->aConf['medias'] : plxUtils::getRacine().$plxMotor->aConf['images'];
+
+		$content = '<img class="'.$class.'" src="'.$imagePath.$image.'" />';
+		
+		#Return
+		echo $content;
+	}
+	
+	
+	/**
+	 * MÃ©thode qui retourn l'image du produit
+	 * 
+	 * @param number of image
+	 * @return src of image
+	 * @author	cfdev
+	*/
+	public function productImage($num) {
+		# rÃ©cupÃ©ration d'une instance de plxMotor
+		$plxMotor = plxMotor::getInstance();
+		# RÃ©cupÃ©ration des infos dans l'urls
 		$get = plxUtils::getGets();
 		if($get) {
 			$arrayUrl = explode("/",$get);
@@ -237,17 +345,22 @@ class mcatalogue extends plxPlugin {
 
 		foreach($products as $product) {	
 			if($getUrl == $product["url"]) {
-				$image = $product["image"];
+				if($num == 1)$image = $product["image"];
+				if($num == 2)$image = $product["image2"];
+				if($num == 3)$image = $product["image3"];
 			}
 		}
-		#Récupération du chemin image
+		#RÃ©cupÃ©ration du chemin image
 		$imagePath = isset($plxMotor->aConf['medias']) ? plxUtils::getRacine().$plxMotor->aConf['medias'] : plxUtils::getRacine().$plxMotor->aConf['images'];
 
-		$content = '<img class="'.$class.'" src="'.$imagePath.$image.'" />';
+		if( !empty($image) ){
+			$content = $imagePath.$image;
+		}
 		
 		#Return
-		echo $content;
+		return $content;
 	}
+	
 	
 } // End Class
 

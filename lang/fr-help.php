@@ -92,34 +92,16 @@
 }
 
 </style>
-<?php
-
-if(isset($_GET['page'])) {
-	$page = $_GET['page'];
-}else{
-	$page = "start";
-}
-?>
-
-<div id="spxwbookmarket_help">
-    <h2>Configuration et aide sur le plugin spxwbookmarket</h2>
-    <ul class="tabnav">
-      <li <?php if ($page=="start") echo ('class="active"'); ?>>
-       <a href="parametres_pluginhelp.php?p=spxwbookmarket&page=start" title="Pour commencer" target="_self">Pour commencer</a>
-      </li>
-       <li <?php if ($page=="configuration") echo ('class="active"'); ?>>
-        <a href="parametres_pluginhelp.php?p=spxwbookmarket&page=configuration" title="configuration de spxwbookmarket" target="_self">Configuration</a>
-      </li>
-      <li <?php if ($page=="widget") echo ('class="active"'); ?>>
-        <a href="parametres_pluginhelp.php?p=spxwbookmarket&page=widget" title="Création du widget" target="_self">Création widget</a>
-      </li>
-      <li <?php if ($page=="display") echo ('class="active"'); ?>>
-        <a href="parametres_pluginhelp.php?p=spxwbookmarket&page=display" title="Affichage du widget" target="_self">Affichage coté client</a>
-      </li>
-    </ul>
-
-	<?php include('fr-help-'.$page.'.php'); ?>
 
 
+<h1>Aide pour mcatalogue</h1>
+<p>Gestion d'un catalogue produit, nécessite <strong>spxdatas v1.78</strong></p>
+<h2>Code pour l'insertion dans une page statique</h2>
+<pre>
+<p>&lt;?php<br />$atts = array();<br />$atts["cat"] = 1;<br />$atts["page"] = 1;<br />$atts["order"] = "price|A";<br /><br />if(eval($this-&gt;plxMotor-&gt;plxPlugins-&gt;callHook('mcatalogueShow', $atts))) return;<br />?&gt;<br />
+</pre>
 
+<h2>ShortCodes</h2>
+<p>Nécessite <strong>spxshortcodes v1.2</strong></p>
+<pre>[MCATALOGUE CAT=001]</pre>
 </div>

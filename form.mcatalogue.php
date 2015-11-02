@@ -10,12 +10,19 @@
 	$config = $plxPlugin->mcatalogueConfig();
 	# Récupération du produit
 	$product = $plxPlugin->productContent();
+
+	# Breadcrumb
+	echo "<ul class=\"breadcrumb\">";
+	echo '<li>'.$plxPlugin->mnuName.'</li>';
+	echo '<li>'.$product["category"].'</li>';
+	echo '<li>'.$product["title"].'</li>';
+	echo "</ul>";
 	
 	# Titre du produit ATTENTION BALISE DEJA PRESENTE VIDE!
-	echo('<h1>');
+	echo('<h1 class="mcatalogue">');
 	echo $product["title"];
 	echo('</h1>');
-
+	
 	# Images produit
 	echo '
 	<div class="grid row">
@@ -67,7 +74,7 @@
 	#Détails
 	if( !empty($product["details"]) ) :
 ?>
-	<h2>En savoir plus</h2>
+	<h2 class="mcatalogue">En savoir plus</h2>
     <div id="mtab" class="mtab">   
         <ul class="tabs">
 			<li><a href="#mtab" title="Détails" class="tab active">Détails</a></li>

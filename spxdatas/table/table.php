@@ -3,11 +3,14 @@
 	<description><![CDATA[<p>Your content catalog</p>]]></description>
 	<column>
 		<parameter name="title" type="cdata" option="textinput/30/40" ></parameter>
-		<parameter name="url" type="cdata" option="textinput/30/40" ></parameter>
+		<parameter name="category" type="string" option="liste/mcatalogue_category/title"></parameter>
 		<parameter name="actif" type="string" option="checkboxBooleanreverse" ></parameter>
-		<parameter name="price" type="cdata" option="textinput/6/6" ></parameter>	
+		<parameter name="price" type="cdata" option="textinput/6/6" ></parameter>
+		<parameter name="url" type="cdata" option="textinput/30/40" ></parameter>	
 		<parameter name="image" type="cdata" option="image" ></parameter>
-		<parameter name="category" type="string" option="liste/category/title"></parameter>
+		<parameter name="image2" type="cdata" option="image" ></parameter>
+		<parameter name="image3" type="cdata" option="image" ></parameter>	
+
 		<parameter name="short_description" type="cdata" option="textinput/30/40" ></parameter>
 		<parameter name="content" type="cdata" option="textarea/10/10"></parameter>	
 		<parameter name="details" type="cdata" option="textarea/10/10"></parameter>			
@@ -33,6 +36,7 @@
 	<description><![CDATA[]]></description>
 	<column>
 		<parameter name="currency" type="cdata" option="textinput/5/5" ></parameter>
-		<parameter name="itemsByPage" type="cdata" option="textinput/5/5" ></parameter>			
+		<parameter name="itemsByPage" type="cdata" option="textinput/5/5" ></parameter>
+		<parameter name="share" type="string" option="checkboxBoolean"></parameter>		
 	</column>
 </table>

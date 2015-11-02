@@ -19,7 +19,7 @@ function mcatalogue_func( $atts, $content = null ) {
 	), $atts ) );
 
 
-	return $plxShow->callHook('mcatalogueShow',$cat);
+	return $plxShow->callHook('mcatalogueShow',$atts);
 }
 
 add_shortcode('MCATALOGUE', 'mcatalogue_func');
